@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>ExpoDB zum digitalen Katalog des Badischen Landesmuseums</display-name>
+  <context-param>
+    <param-name>indexfelder</param-name>
+    <param-value>text,nummer,titel,objektbezeichnung,datierung,entstehungszeit,person,ort,schlagwort,material,technik</param-value>
+  </context-param>
+  <context-param>
+    <param-name>filterfelder</param-name>
+    <param-value>inventarnummer,schlagwort,material,technik</param-value>
+  </context-param>
+  <context-param>
+    <param-name>sortierfelder</param-name>
+    <param-value>inventarnummer,person,titel,coll,sammlungsgliederung,standort,inventarisierungsdatum</param-value>
+  </context-param>
+  <context-param>
+    <param-name>verwandschaft</param-name>
+    <param-value>datierung:2,ort:2,material:1</param-value>
+  </context-param>
+</web-app>
