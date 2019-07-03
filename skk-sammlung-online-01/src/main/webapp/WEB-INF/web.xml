@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>ExpoDB zur Sammlung Online der Staatlichen Kunsthalle Karlsruhe</display-name>
+  <context-param>
+    <param-name>indexfelder</param-name>
+    <param-value>text,inventarnummer,epoche,genre,titel,objektbezeichnung,sammlung,ausgestellt,entstehungszeit,person,ort,schlagwort,material,technik</param-value>
+  </context-param>
+  <context-param>
+    <param-name>sortierfelder</param-name>
+    <param-value>entstehungszeit,titel,inventarnummer,person,meisterwerk</param-value>
+  </context-param>
+</web-app>

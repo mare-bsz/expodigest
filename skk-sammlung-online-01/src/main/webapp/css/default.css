@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+.swbexpo_pagination { width: 500px;}
+.swbexpo_pagination_fst,
+.swbexpo_pagination_rev,
+.swbexpo_pagination_ff,
+.swbexpo_pagination_lst
+ { width: 40px; }
