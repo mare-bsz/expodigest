@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context displayName="ExpoDB zur Sammlung Digital der Staatsgalerie Stuttgart">	
+	
+	<Parameter name="solrCoreUrl" value="http://solrprobe.bsz-bw.de:8987/solr/sgssolive" />	
+	<Parameter name="imagePath" value="/mnt/musis/z/sgs/" />
+	
+</Context>

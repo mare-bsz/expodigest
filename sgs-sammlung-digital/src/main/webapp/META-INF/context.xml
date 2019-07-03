@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context displayName="ExpoDB zur Sammlung Online der Staatlichen Kunsthalle Karlsruhe">	
+	
+	<Parameter name="solrCoreUrl" value="http://localhost:8983/solr/smf1" />	
+	<Parameter name="imagePath" value="/mnt/musis/z/smf/" />
+	
+</Context>
