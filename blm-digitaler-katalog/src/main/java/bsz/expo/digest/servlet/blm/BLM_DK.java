@@ -30,7 +30,7 @@ public class BLM_DK extends Digest {
 		try  {
 			
 			final SolrQuery solrQuery  = new SolrQuery(); 
-			solrQuery.setQuery("systematik:\"" + URLDecoder.decode(request.getPathInfo().substring(1), "UTF-8") + "\"");
+			solrQuery.setQuery("systematik:\"BLM_DK_" + URLDecoder.decode(request.getPathInfo().substring(1), "UTF-8") + "\"");
 			solrQuery.setRows(5000);
 			solrQuery.setStart(0);				
 			
