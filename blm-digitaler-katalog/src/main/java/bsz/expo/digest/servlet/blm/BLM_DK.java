@@ -31,7 +31,7 @@ public class BLM_DK extends Digest {
 			
 			final SolrQuery solrQuery  = new SolrQuery(); 
 			solrQuery.setQuery("systematik:\"" + URLDecoder.decode(request.getPathInfo().substring(1), "UTF-8") + "\"");
-			solrQuery.setRows(2000);
+			solrQuery.setRows(5000);
 			solrQuery.setStart(0);				
 			
 			final Templates templates = getTemplates(request.getParameter("fmt"), "json");	
