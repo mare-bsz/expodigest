@@ -48,6 +48,7 @@
         	<xsl:apply-templates select="./langtextde"/>
         	<xsl:apply-templates select="./langtexten"/>
         	<xsl:apply-templates select="./langtextfr"/>
+        	<xsl:apply-templates select="./submasters"/>
         	<xsl:apply-templates select="./fotos"/>
         	<xsl:apply-templates select="./audios"/>
         	<xsl:apply-templates select="./videos"/>
@@ -153,6 +154,10 @@
     		
         	<xsl:template match="langtextfr">
     			<xsl:text>,"langtextfr" : "</xsl:text><xsl:value-of select="java:de.jotwerk.Util.toJson(.)"/><xsl:text>"</xsl:text>
+    		</xsl:template>
+    		
+    		<xsl:template match="submasters">
+    			<xsl:text>,"submaster" : [</xsl:text><xsl:apply-templates select="./submaster" /><xsl:text>]</xsl:text>
     		</xsl:template>
     		
         	<xsl:template match="fotos">
@@ -282,6 +287,11 @@
     		<xsl:template match="foto|video|audio">
     			<xsl:if test="position() != 1"><xsl:text>,</xsl:text></xsl:if>
     			<xsl:text>{"bezeichnung" : "</xsl:text><xsl:value-of select="java:de.jotwerk.Util.toJson(./bezeichnung)" /><xsl:text>"}</xsl:text>
-    		</xsl:template>    			
+    		</xsl:template> 
+    		
+    		<xsl:template match="submaster">
+    			<xsl:if test="position() != 1"><xsl:text>,</xsl:text></xsl:if>
+    			<xsl:text>{"uuid" : "</xsl:text><xsl:value-of select="java:de.jotwerk.Util.toJson(./uuid)" /><xsl:text>"}</xsl:text>
+    		</xsl:template>   			
    
 </xsl:stylesheet>
