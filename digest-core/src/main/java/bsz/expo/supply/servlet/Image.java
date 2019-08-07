@@ -35,7 +35,7 @@ import org.imgscalr.Scalr;
 			try (SolrClient client = new HttpSolrClient.Builder(getServletContext().getInitParameter("solrCoreUrl")).build()) {				
 				
 				final String id = validRequired(request.getParameter("id"));
-				final int pos = validNat(request.getParameter("img"), 0);
+				final int pos = validNat(request.getParameter("pos"), 0);
 				final int width = validNat(request.getParameter("width"), 100);
 				final char mode = validMode(request.getParameter("mode"), 'x');
 														
@@ -44,7 +44,7 @@ import org.imgscalr.Scalr;
 					SolrDocument doc = client.getById(id);			
 					if (doc != null) {								
 						final Collection<Object> bildpfade = doc.getFieldValues("images");
-						if (bildpfade != null && bildpfade.size() >= pos) {
+						if (bildpfade != null && bildpfade.size() > pos) {
 							String bildPfad = getServletContext().getInitParameter("imagePath") + ((String) bildpfade.toArray()[pos]).replaceAll("\\\\", "/");
 							if (width > 0) {
 								ImageIO.write(Scalr.resize(ImageIO.read(new FileInputStream(bildPfad)), getMode(mode), width), "JPEG", image);

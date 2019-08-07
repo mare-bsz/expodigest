@@ -4,7 +4,7 @@
   <groupId>bsz.expo</groupId>
   <artifactId>digest-core</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>expo.digest Core</name>
   <url>http://maven.apache.org</url>
   <dependencies>

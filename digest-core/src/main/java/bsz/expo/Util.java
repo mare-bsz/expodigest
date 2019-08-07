@@ -69,49 +69,46 @@ public class Util {
 		datum = datum.trim().replace("(", "").replace(")","");
 		if (! datum.isEmpty()) {
 			List<Pattern> patterns = new ArrayList<Pattern>();
-			patterns.add(Pattern.compile("\\d\\d.\\d\\d.(\\d\\d\\d\\d)")); 
-			patterns.add(Pattern.compile("\\d\\d.\\d\\d.(\\d\\d\\d\\d) Taufe"));//
-			patterns.add(Pattern.compile("\\d\\d.\\d.(\\d\\d\\d\\d)")); 
-			patterns.add(Pattern.compile("\\d.\\d\\d.(\\d\\d\\d\\d)"));//
-			patterns.add(Pattern.compile("\\d.\\d.(\\d\\d\\d\\d)"));//
-			patterns.add(Pattern.compile("\\d\\d/\\d\\d.\\d\\d.(\\d\\d\\d\\d)")); 
-			patterns.add(Pattern.compile("\\d\\d.\\d\\d./\\d\\d.\\d\\d.(\\d\\d\\d\\d)")); 
-			patterns.add(Pattern.compile("(\\d\\d\\d\\d)"));							//
-			patterns.add(Pattern.compile("(\\d\\d\\d\\d)/\\d\\d"));						//
-			patterns.add(Pattern.compile("\\d\\d.(\\d\\d\\d\\d)"));						//
-			patterns.add(Pattern.compile("\\d\\d./\\d\\d.\\d\\d.(\\d\\d\\d\\d)"));		//
-			patterns.add(Pattern.compile("(vor )\\d\\d.\\d\\d.(\\d\\d\\d\\d)"));		//
-			patterns.add(Pattern.compile("(vor \\d\\d\\d\\d)"));						//
-			patterns.add(Pattern.compile("(vor \\d\\d\\d\\d).\\d\\d.\\d\\d"));						//
-			patterns.add(Pattern.compile("(vor )\\d\\d.\\d.(\\d\\d\\d\\d)"));						//
-			patterns.add(Pattern.compile("(vor \\d\\d\\d\\d) \\?"));	  				//
-			patterns.add(Pattern.compile("(um )(\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("(um \\d\\d\\d\\d-\\d\\d\\d\\d)"));	
-			patterns.add(Pattern.compile("(um )\\d\\d.\\d\\d.(\\d\\d\\d\\d)"));			//	
-			patterns.add(Pattern.compile("(nach )(\\d\\d\\d\\d)"));						//
-			patterns.add(Pattern.compile("(nach )\\d\\d.\\d\\d.(\\d\\d\\d\\d)"));		//
-			patterns.add(Pattern.compile("(\\d\\d\\d\\d)( \\?)"));
-			patterns.add(Pattern.compile("(\\d\\d\\d\\d)(\\?)"));//
-			patterns.add(Pattern.compile("(\\d\\d\\d\\d/\\d\\d\\d\\d)"));				//
-			patterns.add(Pattern.compile("\\d\\d.(\\d\\d\\d\\d)/\\d\\d\\d\\d"));		//
-			patterns.add(Pattern.compile("\\d\\d.\\d\\d.(\\d\\d\\d\\d)/\\d\\d\\d\\d"));//
-			patterns.add(Pattern.compile("\\d\\d\\d\\d/\\d\\d.\\d\\d.(\\d\\d\\d\\d)"));//
-			patterns.add(Pattern.compile("(um \\d\\d\\d\\d/\\d\\d\\d\\d)"));			 //
-			patterns.add(Pattern.compile("(um \\d\\d\\d\\d/\\d\\d)"));			
-			patterns.add(Pattern.compile("\\d\\d..od..\\d\\d.\\d\\d.(\\d\\d\\d\\d)"));	//
-			patterns.add(Pattern.compile("\\d\\d.\\d\\d.(\\d\\d\\d\\d)./.\\d\\d\\d\\d"));	
-			patterns.add(Pattern.compile("Januar (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("Februar (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("März (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("April (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("Mai (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("Juni (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("Juli (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("August (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("September (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("Oktober (\\d\\d\\d\\d)"));
-			patterns.add(Pattern.compile("November (\\d\\d\\d\\d)"));	
-			patterns.add(Pattern.compile("Dezember (\\d\\d\\d\\d)"));
+			patterns.add(Pattern.compile("\\d{1,2}\\.\\d{1,2}\\.(\\d{4}|\\d{2})")); 
+			patterns.add(Pattern.compile("\\d{1,2}\\.\\d{1,2}\\.(\\d{4}|\\d{2}) Taufe"));//
+			patterns.add(Pattern.compile("\\d{1,2}/\\d{1,2}\\.\\d{1,2}.(\\d{4})")); 
+			patterns.add(Pattern.compile("\\d{1,2}\\.\\d{1,2}\\./\\d{1,2}\\.\\d{1,2}\\.(\\d{4})")); 
+			patterns.add(Pattern.compile("(\\d{4})"));							//
+			patterns.add(Pattern.compile("(\\d{4})/\\d{1,2}"));						//
+			patterns.add(Pattern.compile("\\d{1,2}\\.(\\d{4})"));						//
+			patterns.add(Pattern.compile("\\d{1,2}\\./\\d{1,2}\\.\\d{1,2}\\.(\\d{4})"));		//
+			patterns.add(Pattern.compile("(vor )\\d{1,2}\\.\\d{1,2}\\.(\\d{4})"));		//
+			patterns.add(Pattern.compile("(vor \\d{4})"));						//
+			patterns.add(Pattern.compile("(vor \\d{4})\\.\\d{1,2}\\.\\d{1,2}"));						//
+			patterns.add(Pattern.compile("(vor )\\d{1,2}\\.\\d{1,2}\\.(\\d{4})"));						//
+			patterns.add(Pattern.compile("(vor \\d{4}) \\?"));	  				//
+			patterns.add(Pattern.compile("(um )(\\d{4})"));
+			patterns.add(Pattern.compile("(um \\d{4}-\\d{4})"));	
+			patterns.add(Pattern.compile("(um )\\d{1,2}\\.\\d{1,2}\\.(\\d{4})"));			//	
+			patterns.add(Pattern.compile("(nach )(\\d{4})"));						//
+			patterns.add(Pattern.compile("(nach )\\d{1,2}.\\d{1,2}.(\\d{4})"));		//
+			patterns.add(Pattern.compile("(\\d{4})( \\?)"));
+			patterns.add(Pattern.compile("(\\d{4})(\\?)"));//
+			patterns.add(Pattern.compile("(\\d{4}/\\d{4})"));				//
+			patterns.add(Pattern.compile("\\d{1,2}.(\\d{4})/\\d{4}"));		//
+			patterns.add(Pattern.compile("\\d{1,2}.\\d{1,2}.(\\d{4})/\\d{4}"));//
+			patterns.add(Pattern.compile("\\d{4}/\\d{1,2}.\\d{1,2}.(\\d{4})"));//
+			patterns.add(Pattern.compile("(um \\d{4}/\\d{4})"));			 //
+			patterns.add(Pattern.compile("(um \\d{4}/\\d{1,2})"));			
+			patterns.add(Pattern.compile("\\d{1,2}..od..\\d{1,2}.\\d{1,2}.(\\d{4})"));	//
+			patterns.add(Pattern.compile("\\d{1,2}.\\d{1,2}.(\\d{4})./.\\d{4}"));	
+			patterns.add(Pattern.compile("Januar (\\d{4})"));
+			patterns.add(Pattern.compile("Februar (\\d{4})"));
+			patterns.add(Pattern.compile("März (\\d{4})"));
+			patterns.add(Pattern.compile("April (\\d{4})"));
+			patterns.add(Pattern.compile("Mai (\\d{4})"));
+			patterns.add(Pattern.compile("Juni (\\d{4})"));
+			patterns.add(Pattern.compile("Juli (\\d{4})"));
+			patterns.add(Pattern.compile("August (\\d{4})"));
+			patterns.add(Pattern.compile("September (\\d{4})"));
+			patterns.add(Pattern.compile("Oktober (\\d{4})"));
+			patterns.add(Pattern.compile("November (\\d{4})"));	
+			patterns.add(Pattern.compile("Dezember (\\d{4})"));
 			patterns.add(Pattern.compile("\\d{2}\\.(\\d{4})/\\d{2}\\.\\d{4}"));
 			patterns.add(Pattern.compile("\\d{2}\\.\\d{2}\\./\\d{2}\\.(\\d{4})"));
 			patterns.add(Pattern.compile("\\d{2}\\.\\d{2}\\.(\\d{4})/\\d{2}"));
@@ -132,7 +129,11 @@ public class Util {
 				if (match.matches()) {
 					String result = "";
 					for (int i = 1; i <= match.groupCount(); i++) {
-						result = result + match.group(i);
+						String jahr = match.group(i);
+						if (jahr.length() == 2) {
+							jahr = "20" + jahr;
+						}
+						result = result + jahr;
 					}
 					return result;
 				}

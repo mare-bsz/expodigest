@@ -40,7 +40,7 @@ public class Selekt extends Export {
 			final SolrQuery solrQuery  = new SolrQuery();
 			solrQuery.setStart(validNat(request.getParameter("fst"), 0));
 			solrQuery.setRows(validNat(request.getParameter("len"), 10));
-			solrQuery.setSort(validSort(request.getParameter("srt"), "s_entstehungszeit"), SolrQuery.ORDER.asc);
+			solrQuery.setSort("s_" + validSort(request.getParameter("srt")), SolrQuery.ORDER.asc);
 			solrQuery.setQuery(compileQuery(request.getParameter("qry"), "*:*"));
 			solrQuery.setFilterQueries(compileFilter(request.getParameter("flt"),new String[]{"display:browse"}));
 			

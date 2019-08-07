@@ -21,8 +21,8 @@ import org.apache.solr.common.SolrDocument;
 
 import bsz.expo.Digest;
 	
-	@WebServlet("/pdf")
-	public class Pdf extends Digest {
+	@WebServlet("/audio")
+	public class Audio extends Digest {
 		private static final long serialVersionUID = 1L;		
 		   	
 	    /**
@@ -33,18 +33,19 @@ import bsz.expo.Digest;
 			try (SolrClient client = new HttpSolrClient.Builder(getServletContext().getInitParameter("solrCoreUrl")).build()) {				
 				
 				final String id = validRequired(request.getParameter("id"));
-				final int pos = validNat(request.getParameter("pos"), 0);				
+				final int pos = validNat(request.getParameter("pos"), 0);
+				final String lang = validLang(request.getParameter("lang"), "de");
 								
-				response.setContentType("application/pdf");	
+				response.setContentType("audio/mpeg");	
 										
 				SolrDocument doc = client.getById(id);			
 				if (doc != null) {								
-					final Collection<Object> pdfs = doc.getFieldValues("docs");
-					if (pdfs != null && pdfs.size() > pos) {
-						String docPfad = getServletContext().getInitParameter("imagePath") + ((String) pdfs.toArray()[pos]).replaceAll("\\\\", "/");
+					final Collection<Object> dateien = doc.getFieldValues("audios" + lang);
+					if (dateien != null && dateien.size() > pos) {
+						String docPfad = getServletContext().getInitParameter("imagePath") + ((String) dateien.toArray()[pos]).replaceAll("\\\\", "/");
 						copyFile(response.getOutputStream(), docPfad);							
 					} else {
-						throw new IllegalArgumentException("Keine PDFs zu " + id + " und Position " + pos + " gefunden.");
+						throw new IllegalArgumentException("Keine Audiodateien zu " + id + " und Position " + pos + " gefunden.");
 					}
 				} else {
 					throw new IllegalArgumentException("Keine Daten zu " + id + " gefunden.");

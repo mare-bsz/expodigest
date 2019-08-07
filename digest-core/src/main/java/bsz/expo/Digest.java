@@ -39,6 +39,7 @@ public abstract class Digest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	TransformerFactory tFactory = null;
+	String defaultSortierung = null;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {		
@@ -46,6 +47,7 @@ public abstract class Digest extends HttpServlet {
 		if (config.getServletContext().getAttribute("templates") == null) {
 			config.getServletContext().setAttribute("templates", new HashMap<String, Templates>());
 		}
+		defaultSortierung = config.getInitParameter("defaultSortierung") != null ? config.getInitParameter("defaultSortierung") : "entstehungszeit";
 		super.init(config);
 	}
 
@@ -110,7 +112,7 @@ public abstract class Digest extends HttpServlet {
 		} 
 		return result;
 	}
-	
+		
 	protected String validRequired(final String parameter) throws IllegalArgumentException {
 		return validRequired(parameter, "Parameter id darf nicht null oder leer sein!");
 	}
@@ -124,12 +126,24 @@ public abstract class Digest extends HttpServlet {
 		}
 	}
 	
-	protected String validSort(final String parameter, String result) throws IllegalArgumentException {
-		if (getServletContext().getInitParameter("sortierfelder").contains(parameter)) {
-			result = "s_" + parameter;
+	protected String validSort(final String parameter) throws IllegalArgumentException {
+		if (parameter == null) {
+			return defaultSortierung;
+		} else if (getServletContext().getInitParameter("sortierfelder").contains(parameter)) {
+			return parameter;
 		} else {
 			throw new IllegalArgumentException("Parameter " + parameter + " ist nicht in den Sortierfeldern!");
 		}
+	}
+	
+	protected String validLang(final String parameter, String result) throws IllegalArgumentException {
+		if (parameter != null) {
+			if ("de".equals(parameter) || "en".equals(parameter) || "fr".equals(parameter)) {
+				result = parameter;
+			} else {
+				throw new IllegalArgumentException("Lang-Parameter darf nur de, en oder fr sein.");
+			}
+		} 
 		return result;
 	}
 	
@@ -140,6 +154,17 @@ public abstract class Digest extends HttpServlet {
 			throw new IllegalArgumentException("Fehler beim Kompilieren der Anfrage: Facet Query Term " + parameter + " nicht unter den Filterfeldern.");
 		}
 	}
+	
+	protected String validFormat(final String parameter, final String vorgabe) throws IllegalArgumentException { 
+		if (parameter != null) {
+			if (new File(getServletContext().getRealPath("WEB-INF/xsl/" + parameter + ".xsl")).exists()) {
+				return parameter;
+			} else {
+				throw new IllegalArgumentException("Fehler beim Kompilieren der Anfrage: Format " + parameter + " ist nicht vorhanden.");
+			}
+		}
+		return vorgabe;		
+	}	
 	
 	protected void writeToResponse(HttpServletResponse response, final SolrParams solrQuery, final Transformer transformer)
 			throws IOException, Exception, UnsupportedEncodingException {

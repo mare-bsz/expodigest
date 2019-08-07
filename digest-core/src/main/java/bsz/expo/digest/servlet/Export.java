@@ -50,13 +50,18 @@ public class Export extends Digest {
 		
 		try (SolrClient client = new HttpSolrClient.Builder(getServletContext().getInitParameter("solrCoreUrl")).build()) {
 			
+			final int fst = validNat(request.getParameter("fst"), 0);
+			final int len = validNat(request.getParameter("len"), 10);
+			final String srt = validSort(request.getParameter("srt"));
+			final String fmt = validFormat(request.getParameter("fmt"), "json");			
+			
 			final SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setStart(validNat(request.getParameter("fst"), 0));
-			solrQuery.setRows(validNat(request.getParameter("len"), 10));
-			solrQuery.setSort(validSort(request.getParameter("srt"), "s_entstehungszeit"), SolrQuery.ORDER.asc);
+			solrQuery.setStart(fst);
+			solrQuery.setRows(len);
+			solrQuery.setSort("s_" + srt, SolrQuery.ORDER.asc);
 			solrQuery.setQuery(compileQuery(request.getParameter("qry"), "*:*"));
 			
-			final Templates templates = getTemplates(request.getParameter("fmt"), "json");
+			final Templates templates = getTemplates(fmt);
 			
 			response.setContentType(templates.getOutputProperties().getProperty("media-type"));
 			response.setCharacterEncoding("UTF-8");
@@ -68,19 +73,23 @@ public class Export extends Digest {
 					writer.println("<?xml version=\"1.0\" ?>");
 					writer.println("<result>");
 					writer.println("<head>");
-					writer.println("<query>" + solrQuery.getQuery() + "</query>");
 					writer.println("<numFound>" + solrDocumentList.getNumFound() + "</numFound>");
-					writer.println("<start>" + request.getParameter("fst") + "</start>");
-					writer.println("<len>" + request.getParameter("len") + "</len>");
+					writer.println("<qry>" + request.getParameter("qry") + "</qry>");
+					writer.println("<srt>" + srt + "</srt>");
+					writer.println("<fst>" + fst + "</fst>");
+					writer.println("<len>" + len + "</len>");
+					writer.println("<fmt>" + fmt + "</fmt>");
 					writer.println("</head>");
 					transformRecords(writer, solrDocumentList, templates.newTransformer());					
 					writer.println("</result>");
 				} else {
 					writer.println("{ \"head\" : {");
-					writer.println(" \"query\" : \"" + Util.toJson(solrQuery.getQuery()) + "\",");
 					writer.println(" \"numFound\" : \"" + solrDocumentList.getNumFound() + "\",");
-					writer.println("\"start\" : \"" + request.getParameter("fst") + "\",");
-					writer.println("\"len\" : \"" + request.getParameter("len") + "\"");
+					writer.println(" \"qry\" : \"" + Util.toJson(request.getParameter("qry")) + "\",");
+					writer.println(" \"srt\" : \"" + srt + "\",");
+					writer.println("\"fst\" : \"" + fst + "\",");
+					writer.println("\"len\" : \"" + len + "\",");
+					writer.println("\"fmt\" : \"" + fmt + "\"");
 					writer.println("},");
 					writer.println("\"records\" : ");
 					writer.println("[");
