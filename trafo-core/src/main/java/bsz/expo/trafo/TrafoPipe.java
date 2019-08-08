@@ -18,7 +18,7 @@ public abstract class TrafoPipe {
 	private Map<String, String> parameters = new HashMap<String, String>();
 	public Map<String, String> getParameters() { return parameters; }
 	public void addParameter(String name, String value) { parameters.put(name, value); }
-	protected String getParameter(String key) {
+	public String getParameter(String key) {
 		String result = null;
 		result = parameters.get(key);
 		if (result == null && trafoPipeline != null) {

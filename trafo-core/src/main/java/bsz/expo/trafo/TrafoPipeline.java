@@ -112,7 +112,7 @@ public class TrafoPipeline extends TrafoPipe {
 			final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
 			xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
 			xmlReader.setContentHandler(pipelineHandler);
-			xmlReader.parse(new InputSource(pipelineDefinition));						
+			xmlReader.parse(new InputSource(pipelineDefinition));			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} 	
