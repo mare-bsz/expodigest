@@ -17,7 +17,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocumentList;
 
-import bsz.expo.Digest;
+import bsz.expo.digest.Digest;
 
 @WebServlet("/find")
 public class Find extends Digest {

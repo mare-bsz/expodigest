@@ -1,14 +1,13 @@
 package bsz.expo.digest;
 
-import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import bsz.expo.trafo.TrafoException;
 import bsz.expo.trafo.TrafoPipe;
 import bsz.expo.trafo.TrafoTicket;
-import nu.xom.Serializer;
 
 /**
  * ConsolePipe ist eine {@link TrafoPipe}, die ein {@link TrafoTicket} auf die Console oder in eine Textdatei ausgibt.
@@ -19,27 +18,25 @@ import nu.xom.Serializer;
  */
 public class DigestXmlWriterPipe extends TrafoPipe {
 	
-	Serializer serializer;
-	ServletOutputStream out = null;
+	PrintWriter writer = null;
 	
 	@Override
 	public void init() throws TrafoException {		
 		try {
-			HttpServletResponse response = (HttpServletResponse) this.trafoPipeline.getAttribute("outputStream");
+			HttpServletResponse response = (HttpServletResponse) this.trafoPipeline.getAttribute("response");
 			response.setContentType("application/xml");
 			response.setCharacterEncoding("UTF-8");
-			out = response.getOutputStream();
-			serializer = new Serializer(out, "UTF-8");
-			out.print("<?xml version=\"1.0\" ?>");
-			out.print("<result>");
-			out.print("<head>");
-			out.print("<numFound>" + getParameter("numfound") + "</numFound>");
-			out.print("<qry>" + getParameter("qry") + "</qry>");
-			out.print("<srt>" + getParameter("srt") + "</srt>");
-			out.print("<fst>" + getParameter("fst") + "</fst>");
-			out.print("<len>" + getParameter("len") + "</len>");
-			out.print("<fmt>" + getParameter("fmt") + "</fmt>");
-			out.print("</head>");				
+			writer = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
+			writer.print("<?xml version=\"1.0\" ?>");
+			writer.print("<result>");
+			writer.print("<head>");
+			writer.print("<numFound>" + getParameter("numfound") + "</numFound>");
+			writer.print("<qry>" + getParameter("qry") + "</qry>");
+			writer.print("<srt>" + getParameter("srt") + "</srt>");
+			writer.print("<fst>" + getParameter("fst") + "</fst>");
+			writer.print("<len>" + getParameter("len") + "</len>");
+			writer.print("<fmt>" + getParameter("fmt") + "</fmt>");
+			writer.print("</head>");				
 		} catch (Exception e) {
 			throw new TrafoException(e);
 		}
@@ -49,23 +46,15 @@ public class DigestXmlWriterPipe extends TrafoPipe {
 	@Override
 	public void process(TrafoTicket ticket) throws TrafoException {
 		if (ticket.getDocument() != null) {
-			try {				
-				serializer.write(ticket.getDocument());
-				serializer.flush();
-			} catch (IOException e) {
-				throw new TrafoException(e);
-			}			
+			writer.print(ticket.getDocument().getRootElement().toXML());						
 		}		
 		super.process(ticket);
 	}	
 	
 	@Override
 	public void finit() throws TrafoException {	
-		try {
-			out.println("</result>");			
-		} catch (IOException e) {
-			throw new TrafoException(e);
-		}
+		writer.println("</result>");
+		writer.close();
 		super.finit();
 	}
 }

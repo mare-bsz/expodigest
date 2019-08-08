@@ -16,9 +16,10 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.QueryResponse;
 
-import bsz.expo.Digest;
+import bsz.expo.digest.Digest;
+
+import org.apache.solr.client.solrj.response.QueryResponse;
 
 /**
  * Servlet implementation class Items

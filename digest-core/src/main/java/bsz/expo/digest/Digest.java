@@ -1,4 +1,4 @@
-package bsz.expo;
+package bsz.expo.digest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,11 +26,21 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.SolrParams;
+
+import bsz.expo.Util;
+import bsz.expo.trafo.TrafoException;
+import bsz.expo.trafo.TrafoPipeline;
+import bsz.expo.trafo.TrafoTicket;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
 
 /**
  * Servlet implementation class Items
@@ -46,6 +56,9 @@ public abstract class Digest extends HttpServlet {
 		tFactory = TransformerFactory.newInstance();
 		if (config.getServletContext().getAttribute("templates") == null) {
 			config.getServletContext().setAttribute("templates", new HashMap<String, Templates>());
+		}
+		if (config.getServletContext().getAttribute("pipelines") == null) {
+			config.getServletContext().setAttribute("pipelines", new HashMap<String, TrafoPipeline>());
 		}
 		defaultSortierung = config.getInitParameter("defaultSortierung") != null ? config.getInitParameter("defaultSortierung") : "entstehungszeit";
 		super.init(config);
@@ -95,6 +108,53 @@ public abstract class Digest extends HttpServlet {
 		}
 	}
 	
+	protected void queryAndAnswer(final SolrQuery solrQuery, final TrafoPipeline pipeline) 
+			throws SolrServerException, IOException, TrafoException, ParsingException, ValidityException {
+		
+		try (SolrClient client = new HttpSolrClient.Builder(getServletContext().getInitParameter("solrCoreUrl")).build()) {
+		
+			final SolrDocumentList  solrDocumentList = client.query(solrQuery).getResults();
+			
+			pipeline.addParameter("numfound",Long.toString(solrDocumentList.getNumFound()));
+			
+			pipeline.init();
+			for (SolrDocument solrDoc : solrDocumentList) {
+				TrafoTicket ticket = new TrafoTicket();				
+				Builder parser = new Builder();
+				Document xomDoc = parser.build(new StringReader(solrDoc.getFieldValue("payload").toString()));				
+				ticket.setDocument(xomDoc);
+				pipeline.process(ticket);
+			}
+			pipeline.finit();
+		} 
+	}
+	
+	
+	
+	protected TrafoPipeline getPipeline(final String fmt) throws TrafoException {	
+		@SuppressWarnings("unchecked")
+		Map<String, TrafoPipeline> pipelines = (Map<String, TrafoPipeline>) getServletContext().getAttribute("pipelines");
+		if (!pipelines.containsKey(fmt)) {
+			TrafoPipeline pipeline = TrafoPipeline.createTrafoPipeline(findPipelineFile(fmt), new DigestTrafoContext(getServletContext()));
+			pipeline.addParameter("fmt", fmt);
+			pipelines.put(fmt, pipeline);			
+		} 		
+		return pipelines.get(fmt);
+	}
+		
+	private File findPipelineFile(final String pipelineName) throws TrafoException {
+		if (pipelineName != null && !pipelineName.isEmpty()) {
+			final File pipelineFile = new File(getServletContext().getRealPath("/WEB-INF/pipelines/" + pipelineName + ".pipeline"));
+			if (pipelineFile.exists()) {
+				return pipelineFile;
+			} else {
+				throw new TrafoException(pipelineName + ".pipeline existiert nicht.");
+			}
+		} else {
+			throw new TrafoException("Pipeline-Name ist Null oder leer");
+		} 	
+	}
+	
 	protected int validNat(final String parameter, int result) throws IllegalArgumentException {
 		return validNat(parameter, result, "Parameter img: " + parameter + " muss eine Zahl größer Null sein!");
 	}
@@ -107,6 +167,21 @@ public abstract class Digest extends HttpServlet {
 					throw new IllegalArgumentException(message);
 				}				
 			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException(message);
+			}
+		} 
+		return result;
+	}
+	
+	protected String validNumber(final String parameter, String result) throws IllegalArgumentException {
+		return validNumber(parameter, result, "Parameter " + parameter + " muss eine Zahl sein!");
+	}
+	
+	protected String validNumber(final String parameter, String result, final String message) throws IllegalArgumentException {
+		if (parameter != null) {
+			if (parameter.matches("\\d+")) {
+				result = parameter;
+			} else {	
 				throw new IllegalArgumentException(message);
 			}
 		} 

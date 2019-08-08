@@ -19,7 +19,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 
-import bsz.expo.Digest;
+import bsz.expo.digest.Digest;
 	
 	@WebServlet("/pdf")
 	public class Pdf extends Digest {

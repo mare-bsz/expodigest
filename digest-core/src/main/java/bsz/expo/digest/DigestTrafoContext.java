@@ -1,4 +1,4 @@
-package bsz.expo;
+package bsz.expo.digest;
 
 import javax.servlet.ServletContext;
 
@@ -8,7 +8,7 @@ public class DigestTrafoContext extends TrafoContext {
 	
 	private final ServletContext servletContext;
 	
-	DigestTrafoContext(final ServletContext context) {
+	public DigestTrafoContext(final ServletContext context) {
 		this.servletContext = context;
 	}
 

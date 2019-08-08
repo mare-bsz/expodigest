@@ -1,14 +1,21 @@
 package bsz.expo.digest;
 
-import java.io.IOException;
-import javax.servlet.ServletOutputStream;
+import java.io.File;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
 import javax.servlet.http.HttpServletResponse;
 
 import bsz.expo.Util;
+import bsz.expo.trafo.TrafoConfig;
 import bsz.expo.trafo.TrafoException;
 import bsz.expo.trafo.TrafoPipe;
 import bsz.expo.trafo.TrafoTicket;
-import nu.xom.Serializer;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Nodes;
+import nu.xom.xslt.XSLException;
+import nu.xom.xslt.XSLTransform;
 
 /**
  * ConsolePipe ist eine {@link TrafoPipe}, die ein {@link TrafoTicket} auf die Console oder in eine Textdatei ausgibt.
@@ -17,29 +24,45 @@ import nu.xom.Serializer;
  * 
  * @author Christof Mainberger (christof.mainberger@bsz-bw.de) *
  */
-public class DigestJsonWriterPipe2 extends TrafoPipe {
+public class DigestJsonWriterPipe extends TrafoPipe {
 	
-	Serializer serializer;
-	ServletOutputStream out = null;
+	Builder builder = new Builder();
+	PrintWriter writer = null;
+	XSLTransform transform;
+	boolean first;
 	
 	@Override
 	public void init() throws TrafoException {		
-		try {			
-			HttpServletResponse response = (HttpServletResponse) this.trafoPipeline.getAttribute("outputStream");
+		try {	
+			final File stylesheetFile = new File(trafoPipeline.getPipelinePath("json.xsl")); 
+			final Document stylesheet = builder.build(stylesheetFile);
+			transform = new XSLTransform(stylesheet);
+			for (String key : getParameters().keySet()) {
+				if (key.startsWith("xslt")) {
+					transform.setParameter(key, getParameter(key));
+				}
+			}
+			for (TrafoConfig config : trafoPipeline.getConfiguration()) {
+				if (config.getName().startsWith("xslt")) {
+					transform.setParameter(config.getName(), config.getValue());
+				}
+			}
+			transform.setParameter("pipeline", trafoPipeline);
+			HttpServletResponse response = (HttpServletResponse) this.trafoPipeline.getAttribute("response");
 			response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
-			out = response.getOutputStream();
-			serializer = new Serializer(out, "UTF-8");
-			out.print("{ \"head\" : { ");
-			out.print(" \"numFound\" : \"" + getParameter("numfound") + "\", ");
-			out.print(" \"qry\" : \"" + Util.toJson(getParameter("qry")) + "\", ");
-			out.print(" \"srt\" : \"" + getParameter("srt") + "\", ");
-			out.print("\"fst\" : \"" + getParameter("fst") + "\", ");
-			out.print("\"len\" : \"" + getParameter("len") + "\", ");
-			out.print("\"fmt\" : \"" + getParameter("fmt") + "\" ");
-			out.print("},");
-			out.print("\"records\" : ");
-			out.print("[");
+			writer = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
+			writer.print("{ \"head\" : { ");
+			writer.print(" \"numFound\" : \"" + getParameter("numfound") + "\", ");
+			writer.print(" \"qry\" : \"" + Util.toJson(getParameter("qry")) + "\", ");
+			writer.print(" \"srt\" : \"" + getParameter("srt") + "\", ");
+			writer.print("\"fst\" : \"" + getParameter("fst") + "\", ");
+			writer.print("\"len\" : \"" + getParameter("len") + "\", ");
+			writer.print("\"fmt\" : \"" + getParameter("fmt") + "\" ");
+			writer.print("},");
+			writer.print("\"records\" : ");
+			writer.print("[");
+			first = true;
 		} catch (Exception e) {
 			throw new TrafoException(e);
 		}
@@ -47,26 +70,30 @@ public class DigestJsonWriterPipe2 extends TrafoPipe {
 	}
 	
 	@Override
-	public void process(TrafoTicket ticket) throws TrafoException {
+	public void process(TrafoTicket ticket) throws TrafoException {		
 		if (ticket.getDocument() != null) {
-			try {				
-				serializer.write(ticket.getDocument());
-				serializer.flush();
-			} catch (IOException e) {
-				throw new TrafoException(e);
-			}			
+			try {
+				if (first) {
+					first = false;
+				} else {
+					writer.print(" , ");
+				}
+				final Nodes output = transform.transform(ticket.getDocument());
+				for (int i = 0; i < output.size(); i++) {
+					writer.print(output.get(i).getValue());
+				}			 			
+			} catch (XSLException xe) {
+				throw new TrafoException(xe);
+			} 						
 		}		
 		super.process(ticket);
 	}	
 	
 	@Override
 	public void finit() throws TrafoException {	
-		try {
-			out.println("]");
-			out.println("}");			
-		} catch (IOException e) {
-			throw new TrafoException(e);
-		}
+		writer.println("]");
+		writer.println("}");
+		writer.close();
 		super.finit();
 	}
 }

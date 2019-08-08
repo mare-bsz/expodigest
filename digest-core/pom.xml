@@ -4,10 +4,15 @@
   <groupId>bsz.expo</groupId>
   <artifactId>digest-core</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>expo.digest Core</name>
   <url>http://maven.apache.org</url>
   <dependencies>
+  		<dependency>
+  			<groupId>bsz.expo</groupId>
+  			<artifactId>trafo-core</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
   		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -68,7 +73,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-    <finalName>digest</finalName>
+    <finalName>digest-0.0.2</finalName>
     <plugins>
 	    <plugin>
 	    	<groupId>org.apache.maven.plugins</groupId>

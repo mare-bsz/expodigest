@@ -18,8 +18,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocumentList;
 
-import bsz.expo.Digest;
 import bsz.expo.Util;
+import bsz.expo.digest.Digest;
 
 /**
  * Servlet implementation class Items
