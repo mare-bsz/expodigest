@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline name="Ausgabe von Json aus expo.digest" description="Transformiert die Daten nach json.">
+	
+	<pipe className="bsz.expo.digest.DigestJsonWriterPipe" />	
+
+</pipeline>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline name="Ausgabe von XML aus expo.digest" description="Reicht die Daten aus dem Solr-Index unverändert weiter.">
+		
+	<pipe className="bsz.expo.digest.DigestXmlWriterPipe" />	
+
+</pipeline>
