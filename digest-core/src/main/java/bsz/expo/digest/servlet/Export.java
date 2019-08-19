@@ -75,6 +75,7 @@ public class Export extends Digest {
 					writer.println("<head>");
 					writer.println("<numFound>" + solrDocumentList.getNumFound() + "</numFound>");
 					writer.println("<qry>" + request.getParameter("qry") + "</qry>");
+					writer.println("<solrqry>" + solrQuery.getQuery() + "</solrqry>");
 					writer.println("<srt>" + srt + "</srt>");
 					writer.println("<fst>" + fst + "</fst>");
 					writer.println("<len>" + len + "</len>");
@@ -86,6 +87,7 @@ public class Export extends Digest {
 					writer.println("{ \"head\" : {");
 					writer.println(" \"numFound\" : \"" + solrDocumentList.getNumFound() + "\",");
 					writer.println(" \"qry\" : \"" + Util.toJson(request.getParameter("qry")) + "\",");
+					writer.println(" \"solrqry\" : \"" + Util.toJson(solrQuery.getQuery()) + "\",");
 					writer.println(" \"srt\" : \"" + srt + "\",");
 					writer.println("\"fst\" : \"" + fst + "\",");
 					writer.println("\"len\" : \"" + len + "\",");

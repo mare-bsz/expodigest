@@ -18,21 +18,40 @@ import javax.swing.text.EditorKit;
 public class Util {
 	
 	public static String toJson(final String src) {
+		if (src == null || src.isEmpty()) {
+			return "";
+		} else {
+			StringBuilder result = new StringBuilder();
+			for (char c : src.trim().toCharArray()) {
+				switch (c) {
+					case '"': result.append("\\\""); break;
+					case '\\': result.append("\\\\"); break;
+					case '\n': result.append("\\n"); break;
+					case '/' : result.append("\\/"); break;
+					case '\b' : result.append("\\b"); break;
+					case '\f' :	result.append("\\f"); break;		
+					case '\r' : result.append("\\r"); break;
+					case '\t' : result.append("\\t"); break;
+					default: result.append(c);
+				}			
+			}
+			return result.toString();	
+		}
+	}
+	
+	public static String toXML(final String src) {
 		StringBuilder result = new StringBuilder();
 		for (char c : src.trim().toCharArray()) {
 			switch (c) {
-				case '"': result.append("\\\""); break;
-				case '\\': result.append("\\\\"); break;
-				case '\n': result.append("\\n"); break;
-				case '/' : result.append("\\/"); break;
-				case '\b' : result.append("\\b"); break;
-				case '\f' :	result.append("\\f"); break;		
-				case '\r' : result.append("\\r"); break;
-				case '\t' : result.append("\\t"); break;
+				case '"': result.append("&quot;"); break;
+				case '<': result.append("&lt;"); break;
+				case '>': result.append("&gt;"); break;
+				case '&' : result.append("&amp;"); break;
+				case '\'' : result.append("&apo;"); break;
 				default: result.append(c);
 			}			
 		}
-		return result.toString();		
+		return result.toString();
 	}
 	
 	public static String extendUml(String src) {
