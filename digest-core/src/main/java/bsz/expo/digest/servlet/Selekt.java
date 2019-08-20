@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -21,14 +24,27 @@ import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
+import bsz.expo.Digest;
 import bsz.expo.Util;
+import bsz.expo.digest.query.SelektQL2Solr;
+import bsz.expo.digest.query.SelektQLErrorListener;
+import bsz.expo.digest.query.SelektQLLexer;
+import bsz.expo.digest.query.SelektQLParser;
 
 /**
  * Servlet implementation class Items
  */
 @WebServlet("/selekt")
-public class Selekt extends Export {
+public class Selekt extends Digest {
 	private static final long serialVersionUID = 1L;	
+	
+	SelektQL2Solr selektQL2Solr;
+	
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		selektQL2Solr = new SelektQL2Solr(config.getServletContext().getInitParameter("indexfelder"));
+		super.init(config);
+	}
 	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,8 +55,8 @@ public class Selekt extends Export {
 			
 			final SolrQuery solrQuery  = new SolrQuery();
 			solrQuery.setStart(validNat(request.getParameter("fst"), 0));
-			solrQuery.setRows(validNat(request.getParameter("len"), 10));
-			solrQuery.setSort("s_" + validSort(request.getParameter("srt")), SolrQuery.ORDER.asc);
+			solrQuery.setRows(validNat(request.getParameter("len"), 10));			
+			solrQuery.setSort("s_" + validSort(request.getParameter("srt")), ("desc".equals(request.getParameter("ord")) ? SolrQuery.ORDER.desc : SolrQuery.ORDER.asc));
 			solrQuery.setQuery(compileQuery(request.getParameter("qry"), "*:*"));
 			solrQuery.setFilterQueries(compileFilter(request.getParameter("flt"),new String[]{"display:browse"}));
 			
@@ -70,11 +86,14 @@ public class Selekt extends Export {
 					writer.println("<?xml version=\"1.0\" ?>");
 					writer.println("<result>");
 					writer.println("<head>");
-					writer.println("<query>" + solrQuery.getQuery() + "</query>");	
-					writer.println("<filters>" + request.getParameter("flt") + "</filters>");
-					writer.println("<facets>" + request.getParameter("fct") + "</facets>");
+					writer.println("<qry>" + request.getParameter("qry") + "</qry>");	
+					writer.println("<solrqry>" + solrQuery.getQuery() + "</solrqry>");	
+					writer.println("<flt>" + request.getParameter("flt") + "</flt>");
+					writer.println("<fct>" + request.getParameter("fct") + "</fct>");
+					writer.println("<srt>" + request.getParameter("srt") + "</srt>");
+					writer.println("<ord>" + request.getParameter("ord") + "</ord>");
 					writer.println("<numFound>" + solrDocumentList.getNumFound() + "</numFound>");
-					writer.println("<start>" + request.getParameter("fst") + "</start>");
+					writer.println("<fst>" + request.getParameter("fst") + "</fst>");
 					writer.println("<len>" + request.getParameter("len") + "</len>");
 					writer.println("</head>");
 					writer.println("<records>");
@@ -95,12 +114,16 @@ public class Selekt extends Export {
 					}
 					writer.println("</result>");
 				} else {
-					writer.println("{ \"head\" : {");
-					writer.println(" \"query\" : \"" + Util.toJson(solrQuery.getQuery()) + "\",");
-					writer.println("\"filters\" : \"" + request.getParameter("flt") + "\",");
-					writer.println("\"facets\" : \"" + request.getParameter("fct") + "\",");						
-					writer.println(" \"numFound\" : \"" + solrDocumentList.getNumFound() + "\",");
-					writer.println("\"start\" : \"" + request.getParameter("fst") + "\",");
+					writer.println("{ \"result\" : {");
+					writer.println(" \"head\" : {");
+					writer.println(" \"qry\" : \"" + Util.toJson(request.getParameter("qry")) + "\",");
+					writer.println(" \"solrqry\" : \"" + Util.toJson(solrQuery.getQuery()) + "\",");
+					writer.println("\"flt\" : \"" + request.getParameter("flt") + "\",");
+					writer.println("\"fct\" : \"" + request.getParameter("fct") + "\",");	
+					writer.println("\"srt\" : \"" + request.getParameter("srt") + "\",");
+					writer.println("\"ord\" : \"" + request.getParameter("ord") + "\",");
+					writer.println("\"numFound\" : \"" + solrDocumentList.getNumFound() + "\",");
+					writer.println("\"fst\" : \"" + request.getParameter("fst") + "\",");
 					writer.println("\"len\" : \"" + request.getParameter("len") + "\"");
 					writer.println("},");
 					writer.println("\"records\" : ");
@@ -125,7 +148,7 @@ public class Selekt extends Export {
 						}
 						writer.println("}");
 					}					
-					writer.println("}");
+					writer.println("}}");
 				}				
 			} 
 			
@@ -139,6 +162,21 @@ public class Selekt extends Export {
 			throw new ServletException(e);		
 		} 
 	}	
+	
+	protected String compileQuery(final String query, String result) throws IllegalArgumentException {
+		if (query != null && ! query.isEmpty()) {
+			final SelektQLErrorListener selektQLErrorListener = new SelektQLErrorListener();
+			SelektQLLexer lexer = new SelektQLLexer(CharStreams.fromString(query));
+			SelektQLParser parser = new SelektQLParser(new CommonTokenStream(lexer));
+			parser.removeErrorListeners();
+			parser.addErrorListener(selektQLErrorListener);
+			result = selektQL2Solr.visit(parser.anfrage());
+			if (selektQLErrorListener.error) {
+				throw new IllegalArgumentException("Fehler beim Kompilieren der Anfrage " + query);
+			}
+		} 
+		return result;
+	}
 	
 	protected String[] compileFilter(final String query, String[] result) throws IllegalArgumentException {
 		
@@ -160,7 +198,5 @@ public class Selekt extends Export {
 			}
 		} 
 		return result;
-	}	
-	
-	
+	}		
 }

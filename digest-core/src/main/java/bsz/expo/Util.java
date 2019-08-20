@@ -15,6 +15,8 @@ import javax.swing.JEditorPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.EditorKit;
 
+import org.apache.solr.common.SolrDocument;
+
 public class Util {
 	
 	public static String toJson(final String src) {
@@ -234,6 +236,12 @@ public class Util {
 		return null;
 	}
 	
-	
+	public static String getSolrValue(final Object doc, final String name) {
+		try {
+			return ((SolrDocument)doc).getFieldValue(name).toString();
+		} catch (Exception e) {
+			return "Fehler: SolrFeld " + name + " lässt sich nicht ermitteln.";
+		}
+	}
 
 }
