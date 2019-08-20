@@ -3,6 +3,8 @@ package bsz.expo;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.solr.common.SolrDocument;
+
 public class SmfUtil2 {
 	
 	private static Pattern ansetzung = Pattern.compile("(.*) \\<.+\\>");
@@ -32,6 +34,14 @@ public class SmfUtil2 {
 			}			
 		}
 		return result.toString();		
+	}
+	
+	public static String getSolrValue(final Object doc, final String name) {
+		try {
+			return ((SolrDocument)doc).getFieldValue(name).toString();
+		} catch (Exception e) {
+			return "Fehler: SolrFeld " + name + " lässt sich nicht ermitteln.";
+		}
 	}
 
 }

@@ -12,11 +12,14 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           		xmlns:java="http://xml.apache.org/xalan/java"
-    			exclude-result-prefixes="java">
+          		xmlns:solr="org.apache.solr.common.SolrDocument"
+    			exclude-result-prefixes="java solr"
+    			extension-element-prefixes="solr">
     			
           			
     <xsl:param name="trenner" select="''" />
 	<xsl:param name="likes" select="0" />	
+	<xsl:param name="doc" />
 
     <xsl:output method="text" version="1.0" encoding="UTF-8" indent="no" media-type="application/json"/>
     
@@ -30,8 +33,8 @@
     	<xsl:value-of select="$trenner" />
 		{		
         	<xsl:apply-templates select="./imdasid"/>
-			<xsl:text>, "likes": "</xsl:text><xsl:value-of select="$likes"/><xsl:text>"</xsl:text>
-        	<xsl:apply-templates select="./inventarnummer"/>
+			<xsl:text>, "likes": "</xsl:text><xsl:value-of select="java:bsz.expo.Util.getSolrValue($doc, 'likes')"/><xsl:text>"</xsl:text>
+			<xsl:apply-templates select="./inventarnummer"/>
         	<xsl:apply-templates select="./eingangsdatum"/>
         	<xsl:apply-templates select="./eingangsdatumtext"/>
         	<xsl:apply-templates select="./eingangsart"/>

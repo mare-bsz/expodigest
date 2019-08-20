@@ -59,17 +59,18 @@ public abstract class Digest extends HttpServlet {
 			transformer.setParameter("trenner", ",");
 		}		
 	}
-	
+		
 	protected void transformRecord(final Writer writer, final SolrDocument doc, final Transformer transformer) 
 			throws Exception {					
 		try {
+			transformer.setParameter("doc", doc);
 			transformer.transform(
 				new StreamSource(new StringReader(doc.getFieldValue("payload").toString())), 
 				new StreamResult( writer ));
 		} catch (TransformerException e) {
 			throw new Exception("Datensatz mit id " + doc.getFieldValue("id") + " lässt sich nicht transformieren");
 		}				
-	}	
+	}
 	
 	protected Templates getTemplates(final String name, final String vorgabe) 
 			throws TransformerConfigurationException, IOException, IllegalArgumentException {
